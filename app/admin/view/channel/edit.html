@@ -1,0 +1,130 @@
+{extend name="public/base" /}
+{block name="css"}
+<style class="text/css">
+	.table tbody tr.active,.table tbody tr.active>td,.table tbody tr.active>th,.table tbody tr .active{background-color:#F5F5F5!important}
+</style
+{/block}
+
+{block name="body"}
+<article class="page-container" style="padding:0;">
+	<form class="form form-horizontal" id="form-menu-add" action="" method="post">
+		<input type="hidden" name="id" value="<{$data.id}>" id="id">
+		<table class="table table-border table-bg table-bordered layer-table">
+			<tbody>
+
+			<tr>
+				<th class="title">所属游戏</th>
+				<td>
+					<span class="select-box" style="width:200px;">
+                    <select class="select" name="game_id" id="game_id">
+						<?php foreach($game_ids as $k=>$v):?>
+                            <option value="<{$k}>"   {eq name="$data.game_id" value="$k"}selected="selected"{/eq}  ><{$v}></option>
+						<?php endforeach;?>
+                    </select>
+                    </span>
+				</td>
+
+				<th class="title">渠道id</th>
+				<td>
+					<input type="text" class="input-text" value="<{$data.channel_id}>" name="channel_id" id="channel_id">
+				</td>
+			</tr>
+
+			<tr>
+				<th class="title">渠道名称</th>
+				<td>
+					<input type="text" class="input-text" value="<{$data.channel_name}>" name="channel_name">
+				</td>
+
+				<th class="title">渠道别名</th>
+				<td>
+					<input type="text" class="input-text" value="<{$data.channel_alias_name}>" name="channel_alias_name">
+				</td>
+			</tr>
+
+			<tr>
+				<th class="title">包名</th>
+				<td colspan="3">
+					<textarea name="pack_name" class="textarea"><{$data.pack_name}></textarea>
+				</td>
+			</tr>
+
+			<tr class="form-btn">
+				<td colspan="4">
+					<input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;">
+				</td>
+			</tr>
+
+			</tbody>
+
+		</table>
+	</form>
+</article>
+{/block}
+
+
+{block name="javascript"}
+<script type="text/javascript" src="__LIB__/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript">
+
+    $(function(){
+        $("#form-menu-add").validate({
+            rules:{
+                game_id:{
+                    required:true,
+                },
+                channel_id:{
+                    required:true,
+                    remote: {
+                        url: "ajax_check_exists",
+                        type: "post",
+                        data: {
+                            game_id: function() {
+                                return $( "#game_id" ).val();
+                            },
+                            channel_id:function () {
+                                return $('#channel_id').val();
+                            },
+							id:function () {
+								return $('#id').val();
+                            }
+                        }
+                    }
+                },
+                channel_name:{
+                    required:true,
+                }
+            },messages: {
+                game_id: {
+                    required: '请选择所属游戏!'
+                },
+                channel_id: {
+                    required: '请输入渠道id!'
+                },
+                channel_name: {
+                    required: '请输入渠道名称!'
+                },
+            },
+            onkeyup:false,
+            focusCleanup:false,
+            success:"valid",
+            submitHandler:function(form){
+                $(form).ajaxSubmit({success:function(data){
+                    if(data.status == 'y'){
+                        parent.layer.msg('添加成功！',{time:1500,icon:1},function(){
+                            parent.location.reload();
+                        });
+                        return false;
+                    }else{
+                        parent.layer.msg(data.msg,{icon:5});
+                    }
+                }
+                });
+
+            }
+        });
+
+
+    });
+</script>
+{/block}

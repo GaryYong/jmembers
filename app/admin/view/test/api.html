@@ -1,0 +1,53 @@
+﻿<include file="Public/header" />
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 工具 <span class="c-gray en">&gt;</span> API测试 <a class="btn btn-success radius r mr-20" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="pd-20">
+
+	<form method="post" target="response-frame">
+	<table class="table table-border table-bg table-hover">
+			<tr class="text-l">
+				<th>请求地址</th>
+				<td>
+					<select name="domain">
+							<?php foreach($domains as $k=>$v):?>
+							<option value="<{$k}>" <?php if($appStatus == 'online' && $v == '外网'):?>selected="selected"<?php endif;?> ><{$v}></option>
+							<?php endforeach;?>
+					</select>
+				</td>
+			</tr>
+
+		<tr class="text-l">
+			<th>请求方法</th>
+			<td>
+				<?php $firstParam = '';?>
+				<select name="method">
+					<?php foreach($api_method as $method):?>
+					<optgroup label="<{$method.opt_name}>" style="font-weight: bold;color: #000;">
+						<?php foreach($method['opt_data'] as $k=>$data):?>
+							<option value="<{$data.url}>"><{$data.name}></option>
+							<?php $firstParam = $firstParam ? $firstParam : $data['param'];?>
+						<?php endforeach;?>
+					</optgroup>
+					<?php endforeach;?>
+				</select>
+				<input type="submit" value="提交" class="btn btn-primary radius">
+			</td>
+		</tr>
+
+		<tr class="text-l">
+			<th>请求参数</th>
+			<td>
+				<textarea style="width: 100%;height:60px;" name="param"><{$firstParam}></textarea>
+			</td>
+		</tr>
+
+		<tr class="text-l">
+			<th>请求结果</th>
+			<td>
+				<iframe style="border: none;width:100%;height:200px;" name="response-frame"></iframe>
+			</td>
+		</tr>
+	</table>
+	</form>
+</div>
+</body>
+</html>

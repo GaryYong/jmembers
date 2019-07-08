@@ -1,0 +1,139 @@
+{extend name="public/base" /}
+
+{block name="css"}
+<style type="text/css">
+    .table tbody tr.active,.table tbody tr.active>td,.table tbody tr.active>th,.table tbody tr .active{background-color:#F5F5F5!important}
+    label.error{top:12px;}
+    .input-text[type="number"]{width:100%;}
+    .teacher-info-hide{display: none;}
+    #token-error{right:47px;}
+    .forbidden_word {display: none;}
+</style>
+{/block}
+
+
+{block name="body"}
+<article class="page-container" style="padding:0;">
+    <form class="form form-horizontal" id="form-menu-add" action="" method="post">
+        <input type="hidden" name="id" value="<?php echo $id;?>">
+        <input type="hidden" name="name" value="<?php echo $name;?>">
+        <table class="table table-border table-bg table-bordered layer-table">
+            <tbody>
+            <tr>
+
+                <th class="title">用户ID</th>
+                <td width="240px;"><?php echo empty($id) ? '' : $id;?></td>
+
+                <th class="title">操作类型</th>
+                <td width="240px;">
+                    <span class="select-box" style="width:200px;">
+                    <select class="select" id="opt_type" name="opt_type">
+                        <option value="">选择操作类型</option>
+                        <?php foreach($updateTypes as $k=>$v):?>
+                            <option value="<{$k}>" ><{$v}></option>
+                        <?php endforeach;?>
+                    </select>
+                    </span>
+                </td>
+
+            </tr>
+
+            <tr class="forbidden_word">
+                <th class="title">截止时间</th>
+                <td colspan="3">
+                    <input type="text" id="start-date" name="start_date" class="input-text Wdate" style="width:180px;">
+                </td>
+            </tr>
+
+            <tr>
+
+                <th class="title">惩罚原因</th>
+                <td colspan="3">
+                    <textarea class="textarea valid" name="reason" id="reason"></textarea>
+                </td>
+            </tr>
+
+            <tr class="form-btn">
+                <td colspan="4">
+                    <input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;">
+                </td>
+
+            </tr>
+
+            </tbody>
+
+        </table>
+    </form>
+</article>
+{/block}
+
+
+{block name="javascript"}
+<script type="text/javascript" src="__LIB__/laydate/laydate.js"></script>
+<script type="text/javascript" src="__LIB__/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript">
+    var selectRoleId = 0;
+    $(function(){
+
+        $(function () {
+            laydate.render({
+                elem: '#start-date' //指定元素
+                ,type:'datetime'
+            });
+            
+            
+            $('#opt_type').bind('change',function () {
+                var val = $(this).val();
+                if(val == 2){
+                    $('.forbidden_word').show();
+                }else{
+                    $('.forbidden_word').hide();
+                }
+            });
+        })
+
+
+        $("#form-menu-add").validate({
+            rules:{
+                reason:{
+                    required:true
+                },
+                opt_type:{
+                    required:true,
+                }
+            },messages: {
+                reason: {
+                    required: '请输入惩罚原因!'
+                },
+                opt_type: {
+                    required: ''
+                }
+            },
+            onkeyup:false,
+            focusCleanup:false,
+            success:"valid",
+            submitHandler:function(form){
+                $(form).ajaxSubmit({beforeSend: function(){
+                    loading_show('提交中...');
+                },success:function(data){
+                    if(data.status == 'y'){
+                        parent.layer.msg(data.msg,{time:1500,icon:1},function(){
+                            parent.location.reload();
+                        });
+                        return false;
+                    }else{
+                        parent.layer.msg(data.msg,{icon:5});
+                    }
+                },complete:function () {
+                    loading_hide();
+                }
+                });
+
+            }
+        });
+
+
+    });
+
+</script>
+{/block}

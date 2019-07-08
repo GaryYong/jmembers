@@ -1,0 +1,65 @@
+﻿{extend name="public/base" /}
+{block name="body"}
+<{:get_page_nav()}>
+<div class="page-container">
+<div class="pd-20">
+	<form method="post" target="response-frame">
+	<table class="table table-border table-bg table-hover">
+			<tr class="text-l">
+				<th>请求地址</th>
+				<td>
+					<select name="domain">
+						{foreach $domains as $k=>$host}
+							<option value="<{$k}>"><{$host}></option>
+						{/foreach}
+					</select>
+				</td>
+			</tr>
+
+		<tr class="text-l">
+			<th>请求方法</th>
+			<td>
+				<?php $firstParam = '';?>
+				<select name="method" id="method-select">
+					{volist name="api_method" id="method"}
+					<optgroup label="<{$method.opt_name}>" style="font-weight: bold;color: #000;">
+						{volist name="method['opt_data']" id="data"}
+							<option value="<{$data.url}>" title="<{$data.param|lr_replace}>"><{$data.name}></option>
+							<?php $firstParam = $firstParam ? $firstParam : $data['param'];?>
+						{/volist}
+					</optgroup>
+					{/volist}
+				</select>
+				<input type="submit" value="提交" class="btn btn-primary radius">
+			</td>
+		</tr>
+
+		<tr class="text-l">
+			<th>请求参数</th>
+			<td>
+				<textarea style="width: 100%;height:60px;" name="param" id="param"><{$firstParam}></textarea>
+			</td>
+		</tr>
+
+		<tr class="text-l">
+			<th>请求结果</th>
+			<td>
+				<iframe style="border: none;width:100%;height:200px;" name="response-frame"></iframe>
+			</td>
+		</tr>
+	</table>
+	</form>
+</div>
+</div>
+{/block}
+
+{block name="javascript"}
+<script type="text/javascript">
+	$(function(){
+	    $('#method-select').on('change',function(){
+
+			$('#param').val($(this).find("option:selected").attr("title"));
+		});
+	})
+</script>
+{/block}

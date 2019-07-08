@@ -1,0 +1,216 @@
+{extend name="public/base" /}
+
+{block name="css"}
+<style type="text/css">
+    .table tbody tr.active,.table tbody tr.active>td,.table tbody tr.active>th,.table tbody tr .active{background-color:#F5F5F5!important}
+    label.error{top:12px;}
+    .input-text[type="number"]{width:100%;}
+    .teacher-info-hide{display: none;}
+    #token-error{right:47px;}
+    .goods{margin-bottom:10px;}
+    .goods-count{width:180px;}
+
+
+</style>
+{/block}
+
+{block name="body"}
+<article class="page-container" style="padding:0;">
+    <form class="form form-horizontal" id="form-menu-add" action="" method="post">
+        <table class="table table-border table-bg table-bordered layer-table">
+            <tbody>
+            <tr>
+                <th class="title">操作类型</th>
+                <td>
+                    <span class="select-box" style="width:200px;">
+                    <select class="select" name="mail_type" id="mail_type">
+                        <option value="">请选择邮件类型</option>
+                        <?php foreach($mail_types as $k=>$v):?>
+                            <option value="<{$k}>" ><{$v}></option>
+                        <?php endforeach;?>
+                    </select>
+                    </span>
+                </td>
+            </tr>
+
+            <tr>
+
+                <th class="title">邮件标题</th>
+                <td>
+                   <input type="text" name="title" class="input-text" id="title">
+                </td>
+            </tr>
+
+
+            <tr>
+
+                <th class="title">邮件内容</th>
+                <td>
+                    <textarea class="textarea valid" name="body" id="body"></textarea>
+                </td>
+            </tr>
+
+            <tr id="recv" style="display: none;">
+                <th class="title">接收者id</th>
+                <td>
+                    <input type="text" name="receive" class="input-text">
+                </td>
+            </tr>
+
+            <tr>
+                <th class="title">奖励</th>
+                <td id="goods-contain">
+                    <a id="goods-add" class="btn btn-primary radius goods-btn" style="margin-bottom: 10px;" onclick="add_goods(this);">添加道具</a>
+                </td>
+            </tr>
+
+            <tr class="form-btn">
+                <td colspan="2">
+                    <input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;发送&nbsp;&nbsp;">
+                </td>
+
+            </tr>
+
+            </tbody>
+
+        </table>
+    </form>
+</article>
+
+<div id="goods-template" style="display: none;">
+    <div class="goods">
+        <span class="select-box" style="width:200px;">
+        <select class="select" name="goods[__id__][goods_id]">
+            <option value="money">金币</option>
+            <option value="speaker">喇叭</option>
+        </select>
+        </span>
+        数量：<input type="text" name="goods[__id__][goods_count]" class="input-text goods-count" >
+        <a class="btn btn-primary radius goods-btn" onclick="remove_goods(this);">-</a>
+    </div>
+</div>
+
+
+{/block}
+
+{block name="javascript"}
+<script type="text/javascript" src="__LIB__/laydate/laydate.js"></script>
+<script type="text/javascript" src="__LIB__/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript">
+    var selectRoleId = 0,curGoodsCount = 0;
+    function add_goods(doc) {
+        var goodsHtml = $('#goods-template').html();
+        if(!curGoodsCount){
+            curGoodsCount = parseInt($('#goods-contain').find('.goods').length);
+        }else{
+            curGoodsCount++;
+        }
+        goodsHtml = goodsHtml.replace(/__id__/g,curGoodsCount);
+        $('#goods-contain').append(goodsHtml)
+        console.log(goodsHtml);
+    }
+
+    function remove_goods(doc) {
+        $(doc).parent('.goods').remove();
+    }
+
+    $(function(){
+        laydate.render({
+            elem: '#start-date' //指定元素
+            ,type:'datetime'
+        });
+        laydate.render({
+            elem: '#end-date' //指定元素
+            ,type:'datetime'
+        });
+
+        $('#mail_type').on('change',function(){
+            var mailType = $(this).val();
+            if(mailType == 1){
+                $('#recv').show();
+            }else{
+                $('#recv').hide();
+            }
+        });
+
+
+        var mailType = $('#mail_type').find('option:selected').val();
+        if(mailType == 1){
+            $('#recv').show();
+        }else{
+            $('#recv').hide();
+        }
+
+        var submitFalg = false;
+
+        $("#form-menu-add").validate({
+            rules:{
+                mail_type:{
+                    required:true
+                },
+                title:{
+                    required:true,
+                },
+                body:{
+                    required:true
+                }
+            },messages: {
+                mail_type: {
+                    required: ''
+                },
+                title: {
+                    required: '请输入邮件标题!'
+                },
+                body: {
+                    required: '请输入邮件内容!'
+                }
+            },
+            onkeyup:false,
+            focusCleanup:false,
+            success:"valid",
+            submitHandler:function(form){
+                if(submitFalg){
+                    return false;
+                }
+                submitFalg = true;
+                $(form).ajaxSubmit({ beforeSend: function(){
+                  // Handle the beforeSend event
+                    loading_show('邮件发送中...');
+                    submitFalg = true;
+                },success:function(data){
+                    if(data.status == 'y'){
+                        parent.layer.msg(data.msg,{time:1500,icon:1},function(){
+                            parent.location.reload();
+                        });
+                        return false;
+                    }else{
+                        parent.layer.msg(data.msg,{icon:5});
+                    }
+                    submitFalg = false;
+                },error:function(){
+                    submitFalg = false;
+                },complete:function () {
+                    loading_hide();
+                    submitFalg = false;
+                }
+                });
+            }
+        });
+
+
+    });
+
+
+    function makeToken() {
+        var randomStr = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJLKMNOPQRSTUVWXYZ";
+        var randomLen = randomStr.length;
+        var len = 10;
+        var str = '',index=0;
+        for(var i=0;i<len;i++){
+            index = Math.floor(Math.random()*randomLen);
+            str += randomStr.substr(index,1);
+        }
+        $('#token').val(str);
+    }
+</script>
+{/block}

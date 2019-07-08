@@ -1,0 +1,126 @@
+{extend name="public/base" /}
+
+{block name="css"}
+<link href="__LIB__/treetable/jquery.treeTable.css" rel="stylesheet" type="text/css" >
+{/block}
+
+{block name="body"}
+
+
+<article class="page-container" style="padding:0;">
+	<form class="form form-horizontal" id="form-menu-add" action="" method="post">
+		<input type="hidden" name="role_id" value="<{$role_id}>">
+		<table class="table table-border table-bg table-bordered layer-table" id="role-priv">
+			<tbody>
+
+			<tr>
+				<th class="text-l cu-span" style='padding-left:30px;background: #eef3f7;font-weight: normal;'><span style="cursor:pointer;" onClick="javascript:$('input[type=checkbox]').attr('checked', true)">全选</span> / <span style="cursor:pointer;"  onClick="javascript:$('input[type=checkbox]').attr('checked', false)">取消</span></th>
+			</tr>
+
+			<{$categorys}>
+
+			<tr class="form-btn">
+				<td colspan="4">
+					<input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;">
+				</td>
+
+			</tr>
+
+			</tbody>
+
+		</table>
+	</form>
+</article>
+
+{/block}
+
+
+{block name="javascript"}
+
+<script type="text/javascript" src="__LIB__/treetable/jquery.treetable.js"></script>
+<script type="text/javascript" src="__LIB__/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript">
+
+$(function(){
+
+    $(document).ready(function() {
+        $("#role-priv").treeTable({
+            indent: 20
+        });
+    });
+
+
+
+
+    $("#form-menu-add").validate({
+        rules:{
+            role_name:{
+                required:true,
+            },
+            role_status:{
+                required:true,
+            }
+        },messages: {
+            role_name: {
+                required: '请输入角色名称!'
+            },
+            role_status: {
+                required: '请选角色状态!'
+            }
+        },
+        onkeyup:false,
+        focusCleanup:false,
+        success:"valid",
+        submitHandler:function(form){
+            var index = layer.load(0, {shade: false});
+            $(form).ajaxSubmit({success:function(data){
+                layer.close(index);
+                if(data.status == 'y'){
+                    parent.layer.msg(data.msg,{time:1500,icon:1},function(){
+                        parent.location.reload();
+                    });
+                    return false;
+                }else{
+                    parent.layer.msg(data.msg,{icon:5});
+				}
+            }
+            });
+
+        }
+    });
+
+
+});
+
+
+function checknode(obj)
+{
+    var chk = $("input[type='checkbox']");
+    var count = chk.length;
+    var num = chk.index(obj);
+    console.log(count,num);
+    var level_top = level_bottom =  chk.eq(num).attr('level')
+    for (var i=num; i>=0; i--)
+    {
+        var le = chk.eq(i).attr('level');
+        if(eval(le) < eval(level_top))
+        {
+            chk.eq(i).attr("checked",'checked');
+            var level_top = level_top-1;
+        }
+    }
+    for (var j=num+1; j<count; j++)
+    {
+        var le = chk.eq(j).attr('level');
+        if(chk.eq(num).attr("checked")=='checked') {
+            if(eval(le) > eval(level_bottom)) chk.eq(j).attr("checked",'checked');
+            else if(eval(le) == eval(level_bottom)) break;
+        }
+        else {
+            if(eval(le) > eval(level_bottom)) chk.eq(j).attr("checked",false);
+            else if(eval(le) == eval(level_bottom)) break;
+        }
+    }
+}
+</script>
+{/block}

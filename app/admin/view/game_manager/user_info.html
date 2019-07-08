@@ -1,0 +1,271 @@
+{extend name="public/base" /}
+
+{block name="css"}
+<style type="text/css">
+    .gm-user tr th{text-align: center;background-color: #f5fafe;}
+</style>
+{/block}
+{block name="body"}
+<{:get_page_nav()}>
+
+<div class="page-container">
+
+    <form method="get" action="">
+        <div class="text-c">
+           <span class="select-box" style="width:200px;">
+            <select class="select" id="search_type" name="search_type">
+                <option value="">请选择搜索类型</option>
+                <?php foreach($searchTypes as $k=>$v):?>
+                    <option value="<{$k}>" <?php if(isset($_GET['search_type']) && $_GET['search_type'] == $k):?>selected="selected"<?php endif;?>><{$v}></option>
+                <?php endforeach;?>
+            </select>
+            </span>
+            <input type="text" name="key" value="<?php echo isset($_GET['key']) ? $_GET['key'] : '';?>" class="input-text" style="width:260px;">
+            <button type="submit" class="btn btn-success" name="do_submit"><i class="Hui-iconfont">&#xe665;</i> 查询</button>
+        </div>
+    </form>
+
+
+    <?php if(isset($user_info) && is_array($user_info)):?>
+    <div class="cl pd-5 bg-1 bk-gray mt-20">
+        <span class="l">
+            <a href="javascript:;" onclick="layer_show('修改用户','modify_user.html?id=<?php echo $user_info['id'];?>&name=<?php echo $user_info['name'];?>','680','360')" class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i> 修改</a>
+            <a href="javascript:;" onclick="layer_show('修改用户','ban_user.html?id=<?php echo $user_info['id'];?>&name=<?php echo $user_info['name'];?>','680','500')" class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i> 禁言/封号</a>
+        </span>
+    </div>
+    <table class="table table-border table-bg table-bordered gm-user">
+
+        <tbody>
+            <tr>
+                <th width="80">ID</th>
+                <td><?php echo isset($user_info['id']) ? $user_info['id'] : '';?></td>
+                <th width="120">昵称</th>
+                <td><?php echo isset($user_info['name']) ? $user_info['name'] : '';?></td>
+                <th width="120">金币</th>
+                <td width="100"><?php echo isset($user_info['money']) ? $user_info['money'] : '';?></td>
+                <th width="120">喇叭</th>
+                <td><?php echo isset($user_info['speaker']) ? $user_info['speaker'] : '';?></td>
+            </tr>
+
+            <tr>
+                <th>vip点数/分</th>
+                <td><?php echo isset($user_info['vippoint']) ? $user_info['vippoint'] : '';?></td>
+                <th>vip等级</th>
+                <td><?php echo isset($user_info['viplevel']) ? $user_info['viplevel'] : '';?></td>
+                <th>摇钱树点数/分</th>
+                <td><?php echo isset($user_info['moneythreepoint']) ? $user_info['moneythreepoint'] : '';?></td>
+                <th>摇钱树等级</th>
+                <td><?php echo isset($user_info['moneythreelevel']) ? $user_info['moneythreelevel'] : '';?></td>
+            </tr>
+
+            <tr>
+                <th>充值总额/元</th>
+                <td><?php echo isset($user_info['paytotal']) ? number_format($user_info['paytotal']/100) : '';?></td>
+                <th>昨日充值/元</th>
+                <td><?php echo isset($user_info['payyestoday']) ? number_format($user_info['payyestoday']/100) : '';?></td>
+                <th>今日充值/元</th>
+                <td><?php echo isset($user_info['paytoday']) ? number_format($user_info['paytoday']/100) : '';?></td>
+                <th>账号(手机号/微信id)</th>
+                <td><?php echo isset($user_info['account']) ? $user_info['account'] : '';?></td>
+            </tr>
+
+            <?php if(get_game_id() == 5):?>
+            <tr>
+                <th>当前红包券(元)</th>
+                <td><?=isset($user_info['redpackticket']) ? $user_info['redpackticket']/100 : 0?></td>
+                <th>累积获得红包券(元)</th>
+                <td><?=isset($uer_info['redpacktotal']) ? $user_info['redpacktotal']/100 : 0;?></td>
+                <th>累积兑换微信红包金额（元）</th>
+                <td><?=isset($user_info['weixinredpacktotal']) ? $user_info['weixinredpacktotal']/100 : 0?></td>
+                <th></th>
+                <td></td>
+            </tr>
+            <?php endif;?>
+
+            <tr>
+                <th>玩家手机串号</th>
+                <td><?php echo isset($user_info['imei']) ? $user_info['imei'] : '';?></td>
+                <th>最后登入ip</th>
+                <td><?php echo isset($user_info['lastloginip']) ? $user_info['lastloginip'] : '';?></td>
+                <th>最后登入时间</th>
+                <td><?php echo isset($user_info['lastlogintime']) ? date('Y-m-d H:i:s',$user_info['lastlogintime']) : '';?></td>
+                <th>最后登出时间</th>
+                <td><?php echo isset($user_info['lastlogouttime']) ? date('Y-m-d H:i:s',$user_info['lastlogouttime']) : '';?></td>
+            </tr>
+
+            <tr>
+                <th>连续登入天数</th>
+                <td><?php echo isset($user_info['logindays']) ? $user_info['logindays'] : '';?></td>
+                <th>账号创建时间</th>
+                <td><?php echo isset($user_info['regtime']) ? date('Y-m-d H:i:s',$user_info['regtime']) : '';?></td>
+                <th>注册时渠道</th>
+                <td><?php echo isset($channel_list[$user_info['channel']]) ? $channel_list[$user_info['channel']] : '';?></td>
+                <th>现在渠道</th>
+                <td><?php echo isset($channel_list[$user_info['curchannel']]) ? $channel_list[$user_info['curchannel']] : '';?></td>
+            </tr>
+
+
+            <tr>
+                <th>注册机型</th>
+                <td><?php echo isset($user_info['regdevice']) ? $user_info['regdevice'] : '';?></td>
+                <th>现在机型</th>
+                <td><?php echo isset($user_info['device']) ? $user_info['device'] : '';?></td>
+                <th>客户端基准版本号</th>
+                <td><?php echo isset($user_info['baseversion']) ? $user_info['baseversion'] : '';?></td>
+                <th>性别</th>
+                <td><?php echo isset($user_info['sex']) ? $user_info['sex'] : '';?></td>
+            </tr>
+
+            <?php $yesOrNo = [0=>'否',1=>'是'];?>
+
+            <tr>
+                <th>是否机器人</th>
+                <td><?php echo isset($user_info['robot']) ? $yesOrNo[$user_info['robot']] : '';?></td>
+                <th>是否禁言</th>
+                <td><?php echo isset($user_info['forbidchat']) ? $yesOrNo[$user_info['forbidchat']] : '';?></td>
+                <th>是否封号</th>
+                <td colspan="3"><?php echo isset($user_info['forbidlogin']) ? $yesOrNo[$user_info['forbidlogin']] : '';?></td>
+            </tr>
+
+            <tr>
+                <th>头像地址</th>
+                <td colspan="3"><?php if(!empty($user_info['imageurl'])):?><img src="<?php echo isset($user_info['imageurl']) ? $user_info['imageurl'] : '';?>" width="80" height="80"/><?php endif;?></td>
+                <th>签名</th>
+                <td colspan="3"><?php echo isset($user_info['sign']) ? $user_info['sign'] : '';?></td>
+            </tr>
+
+
+            <tr>
+                <th>欢乐三张局数</th>
+                <td><?php echo isset($user_info['thirdround']) ? $user_info['thirdround'] : 0;?></td>
+                <th>欢乐三张胜率</th>
+                <td><?php echo (isset($user_info['thirdround']) && $user_info['thirdround'] > 0) ? sprintf("%.2f%%",($user_info['thirdwinround']/$user_info['thirdround'])*100) : '';?></td>
+
+                <th>欢乐三张下注总数</th>
+                <td><?php echo isset($user_info['thirdbet']) ? $user_info['thirdbet'] : 0;?></td>
+                <th>欢乐三张净赢</th>
+                <td><?php echo isset($user_info['thirdwincount']) ? $user_info['thirdwincount'] : 0;?></td>
+            </tr>
+
+            <tr>
+                <th>天地玄黄局数</th>
+                <td><?php echo isset($user_info['hundredthirdround']) ? $user_info['hundredthirdround'] : 0;?></td>
+                <th>天地玄黄上庄局数</th>
+                <td><?php echo isset($user_info['hundredthirdbankercount']) ? $user_info['hundredthirdbankercount'] : 0;?></td>
+                <th>天地玄黄下注总数</th>
+                <td><?php echo isset($user_info['hundredthirdbet']) ? $user_info['hundredthirdbet'] : 0;?></td>
+                <th>天地玄黄净赢钱</th>
+                <td><?php echo isset($user_info['hundredthirdwincount']) ? $user_info['hundredthirdwincount'] : 0;?></td>
+            </tr>
+
+            <tr>
+                <th>天地玄黄赢局数</th>
+                <td><?php echo isset($user_info['hundredthirdwinround']) ? $user_info['hundredthirdwinround'] : 0;?></td>
+                <th>-</th>
+                <td></td>
+                <th>-</th>
+                <td></td>
+                <th>-</th>
+                <td></td>
+            </tr>
+
+            <tr>
+                <th>森林舞会局数</th>
+                <td><?php echo isset($user_info['forestround']) ? $user_info['forestround'] : 0;?></td>
+                <th>森林舞会上庄局数</th>
+                <td><?php echo isset($user_info['forestbankercount']) ? $user_info['forestbankercount'] : 0;?></td>
+                <th>森林舞会下注总数</th>
+                <td><?php echo isset($user_info['forestbet']) ? $user_info['forestbet'] : 0;?></td>
+                <th>森林舞会净赢钱</th>
+                <td><?php echo isset($user_info['forestwincount']) ? $user_info['forestwincount'] : 0;?></td>
+            </tr>
+
+            <tr>
+                <th>时时彩局数</th>
+                <td><?php echo isset($user_info['lotteryround']) ? $user_info['lotteryround'] : 0;?></td>
+                <th>时时彩下注总数</th>
+                <td><?php echo isset($user_info['lotterybet']) ? $user_info['lotterybet'] : 0;?></td>
+                <th>时时彩净赢钱</th>
+                <td><?php echo isset($user_info['lotterywincount']) ? $user_info['lotterywincount'] : 0;?></td>
+                <th></th>
+                <td></td>
+            </tr>
+
+            <tr>
+                <th>龙凤斗局数</th>
+                <td><?php echo isset($user_info['dragonround']) ? $user_info['dragonround'] : 0;?></td>
+                <th>龙凤斗上庄局数</th>
+                <td><?php echo isset($user_info['dragonbankercount']) ? $user_info['dragonbankercount'] :0;?></td>
+                <th>龙凤斗下注总数</th>
+                <td><?php echo isset($user_info['dragonbet']) ? $user_info['dragonbet'] : 0;?></td>
+                <th>龙凤斗净赢钱</th>
+                <td><?php echo isset($user_info['dragonwincount']) ? $user_info['dragonwincount'] : 0;?></td>
+            </tr>
+
+            <tr>
+                <th>斗地主局数</th>
+                <td><?php echo isset($user_info['doudizhuround']) ? $user_info['doudizhuround'] : 0;?></td>
+                <th>斗地主胜率</th>
+                <td><?php echo (isset($user_info['doudizhuround']) && $user_info['doudizhuround'] > 0) ? sprintf("%.2f%%",($user_info['doudizhuwinround']/$user_info['doudizhuround'])*100) : '';?></td>
+                <th>斗地主输钱</th>
+                <td><?php echo isset($user_info['doudizhulose']) ? $user_info['doudizhulose'] : 0;?></td>
+                <th>斗地主净赢</th>
+                <td><?php echo isset($user_info['doudizhuywincount']) ? $user_info['doudizhuywincount'] : 0;?></td>
+            </tr>
+
+        </tbody>
+    </table>
+
+    <?php elseif(isset($user_info)):?>
+    <div class="panel panel-default mt-30">
+        <div class="panel-header">提示</div>
+        <div class="panel-body text-c"><?php echo isset($user_info) ? $user_info : ''?></div>
+    </div>
+    <?php endif;?>
+</div>
+{/block}
+
+{block name="javascript"}
+<script type="text/javascript">
+function hello(title,url,w,h) {
+    if (title == null || title == '') {
+        title=false;
+    };
+    if (url == null || url == '') {
+        url="404.html";
+    };
+    if (w == null || w == '') {
+        w=800;
+    };
+    if (h == null || h == '') {
+        h=($(window).height() - 50);
+    };
+    layer.open({
+        type: 2,
+        area: [w+'px', h +'px'],
+        fix: false, //涓嶅浐瀹�
+        maxmin: true,
+        shade:0.4,
+        title: title
+        ,btn: ['提交', '复制', '取消']
+        ,yes: function(index, layero){
+            //按钮【按钮一】的回调
+            var body = layer.getChildFrame('body', index);
+            var iframeWin = window[layero.find('iframe')[0]['name']]; //得到iframe页的窗口对象，执行iframe页的方法：iframeWin.method();
+            //console.log(body.html()) //得到iframe页的body内容
+            body.find('#do-submit').click();
+        }
+        ,btn2: function(index, layero){
+            //按钮【按钮二】的回调
+            //return false 开启该代码可禁止点击该按钮关闭
+        }
+        ,btn3: function(index, layero){
+            //按钮【按钮三】的回调
+            //return false 开启该代码可禁止点击该按钮关闭
+        },
+        content: url
+    });
+}
+    
+</script>
+{/block}

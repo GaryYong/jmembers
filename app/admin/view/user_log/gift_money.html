@@ -1,0 +1,139 @@
+{extend name="public/base" /}
+
+{block name="css"}
+<style type="text/css">
+.task-table tr th,.task-table tr td{text-align: center;}
+
+</style>
+
+{/block}
+
+{block name="body"}
+<{:get_page_nav()}>
+
+<div class="page-container">
+
+    <form method="get" action="">
+        <div class="text-c">
+            ID:<input type="text" name="user_id" value="<?php echo isset($_GET['user_id']) ? $_GET['user_id'] : '';?>" class="input-text" style="width:160px;">
+            <input type="text" id="start-date" name="start_date" value="<?php echo isset($_GET['start_date']) ? $_GET['start_date'] : ''?>" class="input-text Wdate" style="width:180px;">
+            -
+            <input type="text" id="end-date" name="end_date" value="<?php echo isset($_GET['end_date']) ? $_GET['end_date'] : ''?>" class="input-text Wdate" style="width:180px;">
+            <button type="submit" class="btn btn-success" name="do_submit"><i class="Hui-iconfont">&#xe665;</i> 查询</button>
+        </div>
+    </form>
+
+
+    <div class="cl pd-5 bg-1 bk-gray mt-20">
+        <span class="l">
+
+        </span>
+    </div>
+    <table class="table table-border table-bg table-bordered">
+        <thead>
+        <tr class="text-c">
+            <th>时间</th>
+            <th>转出用户ID</th>
+            <th>转出用户昵称</th>
+            <th>转入用户id</th>
+            <th>转入用户昵称</th>
+            <th>转账金额</th>
+            <th>转账方式</th>
+        </tr>
+        </thead>
+        <tbody>
+            <?php if($list):?>
+            {volist name='list' id='res'}
+            <tr>
+                <td><{$res.time|date='Y-m-d H:i:s',###}></td>
+                <td><{$res.actorid}></td>
+                <td><{$res.name}></td>
+                <td><{$res.taractorid}></td>
+                <td><{$res.tarname}></td>
+                <td><{$res.money}></td>
+                <td><{$res.post}></td>
+            </tr>
+            {/volist}
+            <?php endif;?>
+        </tbody>
+    </table>
+    <{$page}>
+</div>
+{/block}
+
+{block name="javascript"}
+<script type="text/javascript" src="__LIB__/laydate/laydate.js"></script>
+<script type="text/javascript">
+function show_layer_btn(title,url,w,h) {
+    if (title == null || title == '') {
+        title=false;
+    };
+    if (url == null || url == '') {
+        url="404.html";
+    };
+    if (w == null || w == '') {
+        w=800;
+    };
+    if (h == null || h == '') {
+        h=($(window).height() - 50);
+    };
+    layer.open({
+        type: 2,
+        area: [w+'px', h +'px'],
+        fix: false, //涓嶅浐瀹�
+        maxmin: true,
+        shade:0.4,
+        title: title
+        ,btn: ['提交','取消']
+        ,yes: function(index, layero){
+            //按钮【按钮一】的回调
+            var body = layer.getChildFrame('body', index);
+            var iframeWin = window[layero.find('iframe')[0]['name']]; //得到iframe页的窗口对象，执行iframe页的方法：iframeWin.method();
+            //console.log(body.html()) //得到iframe页的body内容
+            body.find('#do-submit').click();
+        }
+        ,btn2: function(index, layero){
+            //按钮【按钮二】的回调
+            //return false 开启该代码可禁止点击该按钮关闭
+        },
+        content: url
+    });
+}
+
+
+function do_del(url,params){
+    layer.confirm('确认要删除吗？',function(index){
+        $.ajax({
+            type: 'POST',
+            url: url,
+            dataType: 'json',
+            data:params,
+            success: function(data){
+                if(data.status == 'y'){
+                    layer.msg(data.msg,{time:1500,icon:1},function(){
+                        window.location.reload();
+                    });
+                }else{
+                    layer.msg(data.msg,{icon:5});
+                }
+            },
+            error:function(data) {
+                console.log(data.msg);
+            },
+        });
+    });
+}
+
+$(function () {
+    laydate.render({
+        elem: '#start-date' //指定元素
+        ,type:'datetime'
+    });
+    laydate.render({
+        elem: '#end-date' //指定元素
+        ,type:'datetime'
+    });
+})
+    
+</script>
+{/block}

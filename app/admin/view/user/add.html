@@ -1,0 +1,203 @@
+{extend name="public/base" /}
+
+{block name="css"}
+<style type="text/css">
+	.table tbody tr.active,.table tbody tr.active>td,.table tbody tr.active>th,.table tbody tr .active{background-color:#F5F5F5!important}
+	label.error{top:12px;}
+	.input-text[type="number"]{width:100%;}
+	.teacher-info-hide{display: none;}
+</style>
+{/block}
+
+
+{block name="body"}
+<article class="page-container" style="padding:0;">
+	<form class="form form-horizontal" id="form-menu-add" action="" method="post">
+		<table class="table table-border table-bg table-bordered layer-table">
+			<tbody>
+			<tr>
+
+				<th class="title">用户名</th>
+				<td width="240px;">
+					<input type="text" class="input-text" name="user_name">
+				</td>
+
+				<th class="title">角色</th>
+				<td width="240px;">
+					<span class="select-box">
+					<select class="select" id="role-id" name="role_id" size="1">
+						<option value="">==请选择角色==</option>
+						{volist name="roleData" id="role"}
+						<option value="<{$role.role_id}>"><{$role.role_name}></option>
+						{/volist}
+					</select>
+					</span>
+				</td>
+
+			</tr>
+
+
+			<tr>
+
+				<th class="title">密码</th>
+				<td>
+					<input type="password" class="input-text" name="user_passwd" id="user_passwd">
+				</td>
+
+				<th class="title">确认密码</th>
+				<td>
+					<input type="password" class="input-text" name="confirm_user_passwd" id="confirm_user_passwd">
+				</td>
+
+			</tr>
+
+			<tr class="teacher-info teacher-info-hide">
+
+				<th class="title">真实姓名</th>
+				<td>
+					<input type="text" class="input-text" name="teacher_name">
+				</td>
+
+				<th class="title">微信</th>
+				<td>
+					<input type="text" class="input-text" name="teacher_weixin">
+				</td>
+
+			</tr>
+
+			<tr class="teacher-info teacher-info-hide">
+
+				<th class="title">性别</th>
+				<td>
+					<div class="radio-box">
+						<input name="teacher_sex" type="radio" id="display-1" value="0" >
+						<label for="display-1">男</label>
+					</div>
+					<div class="radio-box">
+						<input type="radio" id="display-2" value="1" name="teacher_sex" checked>
+						<label for="display-2">女</label>
+					</div>
+				</td>
+
+				<th class="title">联系地址</th>
+				<td>
+					<input type="text" class="input-text" name="teacher_address">
+				</td>
+
+			</tr>
+
+
+			<tr>
+
+				<th class="title">昵称</th>
+				<td>
+					<input type="text" class="input-text" name="user_nickname">
+				</td>
+
+				<th class="title">是否启用</th>
+				<td>
+					<div class="radio-box">
+						<input name="user_status" type="radio" id="display-1" value="0" checked>
+						<label for="display-1">启用</label>
+					</div>
+					<div class="radio-box">
+						<input type="radio" id="display-2" value="1" name="user_status">
+						<label for="display-2">禁用</label>
+					</div>
+				</td>
+
+			</tr>
+
+			<tr>
+				<th class="title">游戏</th>
+				<td colspan="3">
+					<?php foreach($game_ids as $game_id=>$game_name):?>
+					<div class="check-box">
+						<input type="checkbox" value="<{$game_id}>" id="checkbox-<?php echo $game_id;?>" name="game_ids[]" >
+						<label for="checkbox-<?php echo $game_id;?>"><?php echo $game_name;?></label>
+					</div>
+					<?php endforeach;?>
+				</td>
+			</tr>
+
+			<tr class="form-btn">
+				<td colspan="4">
+					<input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;">
+				</td>
+
+			</tr>
+
+			</tbody>
+
+		</table>
+	</form>
+</article>
+{/block}
+
+
+{block name="javascript"}
+<script type="text/javascript" src="__LIB__/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript">
+	var selectRoleId = 0;
+    $(function(){
+
+        $("#form-menu-add").validate({
+            rules:{
+                user_name:{
+                    required:true,
+                    minlength:3,
+                },
+
+                role_id:{
+                    required:true,
+                },
+                user_passwd:{
+                    required:true,
+                    minlength:5,
+				},
+                confirm_user_passwd:{
+                    required:true,
+                    minlength:5,
+					equalTo: "#user_passwd"
+                }
+            },messages: {
+                user_name: {
+                    required: '请输入用户名!',
+                    minlength:'用户名长度必须大于3位字符'
+                },
+                role_id: {
+                    required: '请选择角色!'
+                },
+                user_passwd: {
+                    required: '请输入密码!',
+                    minlength:'密码长度必须大于5位字符'
+                },
+                confirm_user_passwd: {
+                    required: '请输入确认密码!',
+                    minlength:'密码长度必须大于5位字符',
+                    equalTo:'两次密码输入的不正确!'
+                }
+            },
+            onkeyup:false,
+            focusCleanup:false,
+            success:"valid",
+            submitHandler:function(form){
+                $(form).ajaxSubmit({success:function(data){
+                    if(data.status == 'y'){
+                        parent.layer.msg('添加成功！',{time:1500,icon:1},function(){
+                            parent.location.reload();
+                        });
+                        return false;
+                    }else{
+                        parent.layer.msg(data.msg,{icon:5});
+                    }
+                }
+                });
+
+            }
+        });
+
+
+    });
+</script>
+{/block}

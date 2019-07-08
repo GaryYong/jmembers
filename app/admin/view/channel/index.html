@@ -1,0 +1,68 @@
+{extend name="public/base" /}
+{block name="body"}
+<{:get_page_nav()}>
+
+<div class="page-container">
+    <div class="cl pd-5 bg-1 bk-gray mt-20">
+        <span class="l">
+            <a href="javascript:;" onclick="layer_show('添加渠道','add.html','600','380')" class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i> 添加渠道</a>
+        </span>
+    </div>
+    <table class="table table-border table-bg table-bordered">
+        <thead>
+        <tr class="text-c">
+            <th width="40">所属游戏</th>
+            <th width="40">渠道id</th>
+            <th width="150">渠道名称</th>
+            <th width="40">渠道别名</th>
+            <th width="40">包名</th>
+            <th width="100">管理</th>
+        </tr>
+        </thead>
+        <tbody>
+        {volist name="channelList" id="res"}
+        <tr class="text-c">
+            <td><{$game_ids[$res['game_id']]}></td>
+            <td><{$res.channel_id}></td>
+            <td><{$res.channel_name}></td>
+            <td><{$res.channel_alias_name}></td>
+            <td><{$res.pack_name}></td>
+            <td class="td-manage">
+                <a href='javascript:layer_show("编辑菜单","edit.html?id=<{$res.id}>",600,380);'>编辑</a>
+                |
+                <a href='javascript:confirm_del("<{$res.id}>","确定删除[<{$res.channel_name}>]？");'>删除</a>
+            </td>
+        </tr>
+        {/volist}
+        </tbody>
+    </table>
+</div>
+{/block}
+
+{block name="javascript"}
+<script type="text/javascript">
+    function confirm_del(id,msg){
+        if(!id){return false;}
+        layer.confirm(msg,function(){
+            $.ajax({
+                url:'<{:URL("Channel/ajax_delete")}>',
+                type:'POST',
+                dataType:'json',
+                data:{'id':id},
+                success:function(data){
+                    if(data.status == 'y'){
+                        layer.msg(data.msg,{icon:1},function(){
+                            window.location.reload();
+                        });
+                    }else{
+                        layer.msg(data.msg,{icon:5});
+                    }
+                },
+                error:function(){
+                    layer.msg('服务器错误',{icon:5});
+                }
+            });
+        });
+    }
+</script>
+{/block}

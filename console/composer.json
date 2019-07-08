@@ -1,0 +1,16 @@
+{
+  "autoload": {
+    "psr-4": {
+      "library\\wuti\\cache\\":"../composers/library/wuti/cache/",
+      "library\\wuti\\database\\":"../composers/library/wuti/database/",
+      "library\\wuti\\log\\":"../composers/library/wuti/log/",
+      "library\\wuti\\shard\\":"../composers/library/wuti/shard/",
+      "framework\\wuti\\factory\\": "../composers/framework/wuti/factory/",
+      "console\\factory\\":"factory/",
+      "console\\model\\":"model/",
+      "console\\job\\":"job/",
+      "console\\lib\\":"lib/",
+      "Vendor\\Namespace\\": ""
+    }
+  }
+}

@@ -1,0 +1,161 @@
+{extend name="public/base" /}
+
+{block name="css"}
+<style type="text/css">
+.task-table tr th,.task-table tr td{text-align: center;}
+.table td{text-align: center;}
+</style>
+
+{/block}
+
+{block name="body"}
+<{:get_page_nav()}>
+
+<div class="page-container">
+
+    <form method="get" action="">
+        <div class="text-c">
+            用户ID：<input type="text" name="user_id" value="<?php echo isset($_GET['user_id']) ? $_GET['user_id'] : '';?>" class="input-text" style="width:160px;">
+            游戏/平台订单号：<input type="text" name="plattransid" value="<?php echo isset($_GET['plattransid']) ? $_GET['plattransid'] : '';?>" class="input-text" style="width:160px;">
+            <span class="select-box" style="width:200px;">
+            <select class="select" id="order_status" name="order_status">
+                <option value="">订单状态</option>
+                <?php foreach($orderStatus as $k=>$v):?>
+                    <option value="<{$k}>" <?php if(isset($_GET['order_status']) && $_GET['order_status'] == $k):?>selected="selected"<?php endif;?>><{$v}></option>
+                <?php endforeach;?>
+            </select>
+            </span>
+            <div style="margin-top:10px;">
+            <input type="text" id="start-date" name="start_date" value="<?php echo isset($_GET['start_date']) ? $_GET['start_date'] : ''?>" class="input-text Wdate" style="width:180px;">
+            -
+            <input type="text" id="end-date" name="end_date" value="<?php echo isset($_GET['end_date']) ? $_GET['end_date'] : ''?>" class="input-text Wdate" style="width:180px;">
+            <button type="submit" class="btn btn-success" name="do_submit" onclick="return dosubmit();"><i class="Hui-iconfont">&#xe665;</i> 查询</button>
+            </div>
+        </div>
+    </form>
+
+
+    <div class="cl pd-5 bg-1 bk-gray mt-20">
+        <span class="l">
+
+        </span>
+    </div>
+    <table class="table table-border table-bg table-bordered">
+        <thead>
+        <tr class="text-c">
+            <th>时间</th>
+            <th>用户id</th>
+            <th>商品名称</th>
+            <th>金额(元)</th>
+            <th>支付方式</th>
+            <th>平台订单号</th>
+        </tr>
+        </thead>
+        <tbody>
+            <?php if($list):?>
+            {volist name='list' id='res'}
+            <tr>
+                <td><{$res.time|date='Y-m-d H:i:s',###}></td>
+                <td><{$res.actorid}></td>
+                <td><{$res.goodid}></td>
+                <td><?php echo $res['money']/100;?></td>
+                <td><?php echo isset($payType[$res['platform']]) ? $payType[$res['platform']] : '未知'?></td>
+                <td><{$res.plattransid}></td>
+            </tr>
+            {/volist}
+            <?php endif;?>
+        </tbody>
+    </table>
+    <{$page}>
+</div>
+{/block}
+
+{block name="javascript"}
+<script type="text/javascript" src="__LIB__/laydate/laydate.js"></script>
+<script type="text/javascript">
+function show_layer_btn(title,url,w,h) {
+    if (title == null || title == '') {
+        title=false;
+    };
+    if (url == null || url == '') {
+        url="404.html";
+    };
+    if (w == null || w == '') {
+        w=800;
+    };
+    if (h == null || h == '') {
+        h=($(window).height() - 50);
+    };
+    layer.open({
+        type: 2,
+        area: [w+'px', h +'px'],
+        fix: false, //涓嶅浐瀹�
+        maxmin: true,
+        shade:0.4,
+        title: title
+        ,btn: ['提交','取消']
+        ,yes: function(index, layero){
+            //按钮【按钮一】的回调
+            var body = layer.getChildFrame('body', index);
+            var iframeWin = window[layero.find('iframe')[0]['name']]; //得到iframe页的窗口对象，执行iframe页的方法：iframeWin.method();
+            //console.log(body.html()) //得到iframe页的body内容
+            body.find('#do-submit').click();
+        }
+        ,btn2: function(index, layero){
+            //按钮【按钮二】的回调
+            //return false 开启该代码可禁止点击该按钮关闭
+        },
+        content: url
+    });
+}
+
+
+function do_del(url,params){
+    layer.confirm('确认要删除吗？',function(index){
+        $.ajax({
+            type: 'POST',
+            url: url,
+            dataType: 'json',
+            data:params,
+            success: function(data){
+                if(data.status == 'y'){
+                    layer.msg(data.msg,{time:1500,icon:1},function(){
+                        window.location.reload();
+                    });
+                }else{
+                    layer.msg(data.msg,{icon:5});
+                }
+            },
+            error:function(data) {
+                console.log(data.msg);
+            },
+        });
+    });
+}
+    
+
+
+function dosubmit() {
+    var order_status = $('#order_status').find('option:selected').val();
+    if(!order_status){
+        layer.msg('请选择订单状态');
+        $('#order_status').focus();
+        return false;
+    }
+    loading_show('查询中...');
+    return true;
+}
+
+
+$(function () {
+    laydate.render({
+        elem: '#start-date' //指定元素
+        ,type:'datetime'
+    });
+    laydate.render({
+        elem: '#end-date' //指定元素
+        ,type:'datetime'
+    });
+})
+</script>
+{/block}
