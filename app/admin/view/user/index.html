@@ -1,0 +1,90 @@
+{extend name="public/base" /}
+
+{block name="css"}
+
+
+{block name="body"}
+<{:get_page_nav()}>
+
+<div class="page-container">
+    <div class="cl pd-5 bg-1 bk-gray mt-20">
+        <span class="l">
+            <a href="javascript:;" onclick="layer_show('添加用户','add.html','780','380')" class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i> 添加用户</a>
+        </span>
+    </div>
+    <table class="table table-border table-bg">
+        <thead>
+        <tr class="text-c">
+            <th width="40">ID</th>
+            <th width="150">用户名</th>
+            <th>所属角色</th>
+            <th>昵称</th>
+            <th>最后登陆时间</th>
+            <th>最后登陆IP</th>
+            <th>状态</th>
+            <th width="100">管理</th>
+        </tr>
+        </thead>
+        <tbody>
+            {volist name="userData" id="user"}
+                <tr class="text-c">
+                    <td><{$user.id}></td>
+                    <td><{$user.user_name}></td>
+                    <td><{$user.role_id|get_role_name}></td>
+                    <td><{$user.user_nickname}></td>
+                    <td><{$user.last_login_time|from_unixtime}></td>
+                    <td><{$user.last_login_ip}></td>
+                    <td>{if condition="$user['user_status'] eq '0'"}<span class="label label-success radius">有效</span>{else/}<span class="label radius">禁用</span>{/if}</td>
+                    <td class="td-manage">
+                        {if condition="$userSession['role_id'] eq '1'"}
+                        <a href='javascript:layer_show("编辑用户","edit.html?id=<{$user.id}>",780,380);'>编辑</a>
+                        {if condition="$userSession['id'] neq $user['id']"}
+                        |
+                        <a href='javascript:del_user("<{$user.id}>","确定删除[<{$user.user_name}>]？");'>删除</a>
+                        {/if}
+                        {elseif condition="($userSession['role_id'] neq '1') AND ($user['role_id'] egt $userSession['role_id']) " /}
+                            <a href='javascript:layer_show("编辑用户","edit.html?id=<{$user.id}>",780,380);'>编辑</a>
+                            {if condition="$userSession['id'] neq $user['id']"}
+                            |
+                            <a href='javascript:del_user("<{$user.id}>","确定删除[<{$user.user_name}>]？");'>删除</a>
+                            {/if}
+                        {/if}
+                    </td>
+                </tr>
+            {/volist}
+        </tbody>
+    </table>
+    <div class="dataTables_wrapper no-footer">
+        <{$page}>
+    </div>
+</div>
+{/block}
+
+
+{block name="javascript"}
+<script type="text/javascript">
+    function del_user(id,msg){
+        if(!id){return false;}
+        layer.confirm(msg,function(){
+            $.ajax({
+                url:'<{:URL("User/ajax_delete")}>',
+                type:'POST',
+                dataType:'json',
+                data:{'id':id},
+                success:function(data){
+                    if(data.status == 'y'){
+                        layer.msg(data.msg,{icon:1,time:1},function(){
+                            window.location.reload();
+                        });
+                    }else{
+                        layer.msg(data.msg,{icon:5});
+                    }
+                },
+                error:function(){
+                    layer.msg('服务器错误',{icon:5});
+                }
+            });
+        });
+    }
+</script>
+{/block}

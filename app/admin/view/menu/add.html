@@ -1,0 +1,159 @@
+{extend name="public/base" /}
+{block name="css"}
+<style type="text/css">
+.table tbody tr.active,.table tbody tr.active>td,.table tbody tr.active>th,.table tbody tr .active{background-color:#F5F5F5!important}
+</style>
+{/block}
+
+{block name="body"}
+<article class="page-container" style="padding:0;">
+	<form class="form form-horizontal" id="form-menu-add" action="" method="post">
+		<table class="table table-border table-bg table-bordered layer-table">
+			<tbody>
+			<tr>
+				<th class="title">上级菜单</th>
+				<td>
+					<span class="select-box">
+					<select class="select" name="parentid" size="1">
+						<option value="0">作为一级菜单</option>
+						<{$menu_categorys}>
+					</select>
+					</span>
+				</td>
+
+				<th class="title">菜单名称</th>
+				<td>
+					<input type="text" class="input-text" value="" name="name">
+				</td>
+			</tr>
+
+
+			<tr>
+
+				<th class="title">模块名</th>
+				<td>
+					<input type="text" class="input-text" value="" placeholder="" name="m">
+				</td>
+
+				<th class="title">文件名</th>
+				<td>
+					<input type="text" class="input-text" value="" placeholder="" name="c">
+				</td>
+
+			</tr>
+
+			<tr>
+
+				<th class="title">方法名</th>
+				<td>
+					<input type="text" class="input-text" value="" placeholder="" name="a">
+				</td>
+
+				<th class="title">附加参数</th>
+				<td>
+					<input type="text" class="input-text" value="" placeholder="" name="data">
+				</td>
+
+			</tr>
+
+			<tr>
+
+				<th class="title">样式</th>
+				<td colspan="3">
+					<input type="text" class="input-text" value="" placeholder="" name="style">
+				</td>
+			</tr>
+
+			<tr>
+
+				<th class="title">是否显示</th>
+				<td>
+					<div class="radio-box">
+						<input name="display" type="radio" id="display-1" value="0" checked>
+						<label for="display-1">是</label>
+					</div>
+					<div class="radio-box">
+						<input type="radio" id="display-2" value="1" name="display">
+						<label for="display-2">否</label>
+					</div>
+				</td>
+
+				<th class="title">排序</th>
+				<td>
+					<input type="text" class="input-text" value="99" name="listorder">
+				</td>
+
+			</tr>
+
+
+			<tr class="form-btn">
+				<td colspan="4">
+					<input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;">
+				</td>
+
+			</tr>
+
+			</tbody>
+
+		</table>
+	</form>
+</article>
+{/block}
+
+
+{block name="javascript"}
+<script type="text/javascript" src="__LIB__/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript">
+
+$(function(){
+    $("#form-menu-add").validate({
+        rules:{
+            name:{
+                required:true,
+            },
+            m:{
+                required:true,
+            },
+            c:{
+                required:true,
+            },
+            a:{
+                required:true,
+            }
+        },messages: {
+            name: {
+                required: '请输入菜单名!'
+            },
+            m: {
+                required: '请输入模块名!'
+            },
+            c: {
+                required: '请输入文件名!'
+            },
+            a: {
+                required: '请输入方法名!'
+            }
+        },
+        onkeyup:false,
+        focusCleanup:false,
+        success:"valid",
+        submitHandler:function(form){
+            $(form).ajaxSubmit({success:function(data){
+                if(data.status == 'y'){
+                    parent.layer.msg('添加成功！',{time:1500,icon:1},function(){
+                        parent.location.reload();
+                    });
+                    return false;
+                }else{
+                    parent.layer.msg(data.msg,{icon:5});
+				}
+            }
+            });
+
+        }
+    });
+
+
+});
+</script>
+{/block}

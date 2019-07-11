@@ -1,0 +1,69 @@
+{extend name="public/base" /}
+{block name="body"}
+<{:get_page_nav()}>
+
+<div class="page-container">
+    <div class="cl pd-5 bg-1 bk-gray mt-20">
+        <span class="l">
+            <a href="javascript:;" onclick="layer_show('添加角色','add.html','600','180')" class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i> 添加角色</a>
+        </span>
+    </div>
+    <table class="table table-border table-bg">
+        <thead>
+        <tr class="text-c">
+            <th width="40">ID</th>
+            <th width="150">角色名称</th>
+            <th width="40">状态</th>
+            <th width="100">管理</th>
+        </tr>
+        </thead>
+        <tbody>
+        {volist name="roleList" id="role"}
+        <tr class="text-c">
+            <td><{$role.role_id}></td>
+            <td><{$role.role_name}></td>
+            <td>{if condition="$role['role_status'] eq '0'"}<span class="label label-success radius">有效</span>{else/}<span class="label radius">无效</span>{/if}</td>
+            <td class="td-manage">
+                {neq name="$role['role_id']" value="1"}
+                <a href='javascript:layer_show("编辑菜单","edit.html?role_id=<{$role.role_id}>",600,180);'>编辑</a>
+                |
+                <a href='javascript:layer_show("设置[<{$role.role_name}>]","priv.html?role_id=<{$role.role_id}>",680,480);'>权限</a>
+                |
+                <a href='javascript:del_role("<{$role.role_id}>","确定删除[<{$role.role_name}>]？");'>删除</a>
+                {/neq}
+            </td>
+        </tr>
+        {/volist}
+
+        </tbody>
+    </table>
+</div>
+{/block}
+
+{block name="javascript"}
+<script type="text/javascript">
+    function del_role(id,msg){
+        if(!id){return false;}
+        layer.confirm(msg,function(){
+            $.ajax({
+                url:'<{:URL("Role/ajax_delete")}>',
+                type:'POST',
+                dataType:'json',
+                data:{'role_id':id},
+                success:function(data){
+                    if(data.status == 'y'){
+                        layer.msg(data.msg,{icon:1},function(){
+                            window.location.reload();
+                        });
+                    }else{
+                        layer.msg(data.msg,{icon:5});
+                    }
+                },
+                error:function(){
+                    layer.msg('服务器错误',{icon:5});
+                }
+            });
+        });
+    }
+</script>
+{/block}

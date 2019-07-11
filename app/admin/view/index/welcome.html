@@ -1,0 +1,30 @@
+{extend name="public/base" /}
+{block name="css"}
+<style type="text/css">
+    ul{padding:2px 10px;}
+    ul li{list-style: decimal;}
+    .panel-block{padding:10px 0;}
+    .panel-body .xline{border-top:2px dotted #eee;}
+</style>
+{/block}
+
+{block name="body"}
+<{:get_page_nav()}>
+<div class="page-container">
+  <div class="panel panel-default">
+    <div class="panel-header">更新日志</div>
+    <div class="panel-body">
+      <div class="panel-block">
+        <div class="pblock-title">更新时间：2019-03-30</div>
+        <ul>
+          <li>增加用户信息展示提示</li>
+          <li>新增禁言时的截止时间</li>
+          <li>新增惩罚日志开始时间，结束时间，操作时间</li>
+          <li>新增充值榜，是否机器人，注册渠道，修改充值金额单位由分变为元</li>
+          <li>新增数据总览</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{/block}
